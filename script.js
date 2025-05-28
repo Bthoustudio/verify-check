@@ -42,14 +42,14 @@ document.addEventListener("DOMContentLoaded", () => {
         : "";
 
       resultBox.innerHTML = `
-  <h3>✅ 查驗成功：${record["瓶號"]}</h3>
-  <p>使用店家：${record["使用店家"]}</p>
-  <p>型號：${record["型號"]}</p>
-  <p>領取時間：${dateStr}</p>
-  <p>是否有效：${validStatus}</p>
-  <p>註銷時間：${record["回收時間"] || "-"}</p>
-  ${extraWarning}
-`;
+        <h3>✅ 查驗成功：${record["瓶號"]}</h3>
+        <p>使用店家：${record["使用店家"]}</p>
+        <p>型號：${record["型號"]}</p>
+        <p>領取時間：${dateStr}</p>
+        <p>是否有效：${validStatus}</p>
+        <p>註銷時間：${record["回收時間"] || "-"}</p>
+        ${extraWarning}
+      `;
     } catch (error) {
       console.error("資料載入錯誤：", error);
       resultBox.innerHTML = "<p style='color:red;'>查詢失敗，請稍後再試。</p>";
