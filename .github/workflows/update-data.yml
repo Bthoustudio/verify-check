@@ -13,7 +13,7 @@ jobs:
       - name: Download JSON from Google Apps Script
         run: |
           mkdir -p data
-          curl -sL 'https://script.google.com/macros/s/AKfycbzzjUy242CzvuHyOUtQUoiT18YS8aXEsQIA3BCUci1AOvjWiR13j_pKYrSq6t-7OocR/exec' -o data/data.json
+          curl -sL 'https://script.google.com/macros/s/AKfycbwkeqHS4q0c7QFMiNTAC_Czkw28VBF8TGHC7ifNvY7izmJxltxShUBPZooGTbzMuTL7/exec' -o data/data.json
 
       - name: Commit and push if changed
         run: |
