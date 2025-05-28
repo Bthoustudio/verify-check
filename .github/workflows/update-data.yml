@@ -1,29 +1,28 @@
 name: Update data.json from Google Sheets
 
 on:
-  schedule:
-    - cron: '0 */6 * * *'  # 每 6 小時執行一次
-  workflow_dispatch:       # 可手動執行
+  workflow_dispatch:
 
 jobs:
   fetch-and-commit:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Download latest data.json
-        run: curl -sSL "https://script.google.com/macros/s/AKfycbzzjUy242CzvuHyOUtQUoiT18YS8aXEsQIA3BCUci1AOvjWiR13j_pKYrSq6t-7OocR/exec" -o data/data.json
+      - name: Download JSON from Google Apps Script
+        run: |
+          mkdir -p data
+          curl -sL 'https://script.google.com/macros/s/AKfycbzzjUy242CzvuHyOUtQUoiT18YS8aXEsQIA3BCUci1AOvjWiR13j_pKYrSq6t-7OocR/exec' -o data/data.json
 
       - name: Commit and push if changed
         run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          if [ -n "$(git status --porcelain)" ]; then
-            git add data/data.json
-            git commit -m "🔄 Auto-update data.json from Google Sheets"
-            git push
-          else
+          git config --global user.name 'GitHub Action'
+          git config --global user.email 'action@github.com'
+          if git diff --quiet; then
             echo "No changes to commit"
+          else
+            git add data/data.json
+            git commit -m "🔄 Update data.json from Google Sheets"
+            git push
           fi
