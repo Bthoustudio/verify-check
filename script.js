@@ -47,7 +47,11 @@ document.addEventListener("DOMContentLoaded", () => {
         <p>型號：${record["型號"]}</p>
         <p>領取時間：${dateStr}</p>
         <p>是否有效：${validStatus}</p>
-        <p>註銷時間：${record["回收時間"] || "-"}</p>
+        <p>註銷時間：${
+          record["回收時間"]
+            ? new Date(record["回收時間"]).toLocaleDateString("zh-TW", { year: "numeric", month: "numeric", day: "numeric" })
+            : "-"
+        }</p>
         ${extraWarning}
       `;
     } catch (error) {
