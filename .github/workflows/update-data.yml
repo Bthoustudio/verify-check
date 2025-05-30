@@ -1,7 +1,9 @@
 name: Update data.json from Google Sheets
 
 on:
-  workflow_dispatch:
+  schedule:
+    - cron: '0 */6 * * *'    # 每 6 小時觸發（UTC）
+  workflow_dispatch:         # 也允許手動執行
 
 jobs:
   fetch-and-commit:
