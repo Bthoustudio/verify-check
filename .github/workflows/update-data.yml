@@ -28,3 +28,4 @@ jobs:
             git add data/data.json
             git commit -m "🔄 Update data.json from Google Sheets"
             git push
+          fi
