@@ -29,31 +29,23 @@
       const input = document.getElementById("sn");
       const resultBox = document.getElementById("result");
 
-      const bottleDataURL = "data/data.json"; // 查驗資料 JSON
+      const bottleDataURL = "data/data.json";
       const modelImageURL = "https://script.google.com/macros/s/AKfycbxbmV64Jql7clWQqCaeakyjqkwIfCoRteVROpKeVGRh0dzU8ERdgGdZ95GGNBz7Chmt/exec";
 
       let modelImageMap = {};
 
-      // 預先載入型號對應圖片資料
-      fetch(modelImageURL)
-        .then(res => res.json())
-        .then(data => {
-          data.forEach(item => {
-            if (item["型號"] && item["對應圖片網址"]) {
-              modelImageMap[item["型號"].trim().toLowerCase()] = item["對應圖片網址"];
-            }
+      const formatDate = (dateStr) => {
+        try {
+          return new Date(dateStr).toLocaleDateString("zh-TW", {
+            year: "numeric", month: "numeric", day: "numeric"
           });
-        })
-        .catch(err => {
-          console.error("圖片對應資料載入錯誤：", err);
-        });
+        } catch {
+          return dateStr?.split("T")[0] || "-";
+        }
+      };
 
-      // 查詢提交
-      form.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const sn = input.value.trim();
+      const doQuery = async (sn) => {
         if (!sn) return;
-
         input.classList.remove("border-red-500");
         resultBox.innerHTML = "查詢中...";
 
@@ -71,14 +63,6 @@
             `;
             return;
           }
-
-          const formatDate = (dateStr) => {
-            try {
-              return new Date(dateStr).toLocaleDateString("zh-TW", { year: "numeric", month: "numeric", day: "numeric" });
-            } catch {
-              return dateStr?.split("T")[0] || "-";
-            }
-          };
 
           const revoke = record["是否回收"] === "是";
           const now = new Date();
@@ -98,7 +82,7 @@
             : "";
 
           const imageHTML = imageURL
-            ? `<img src="${decodeURIComponent(imageURL)}" alt="型號 ${model} 圖片" class="mt-4 w-full max-w-xs mx-auto border rounded shadow" />`
+            ? `<img src="${decodeURIComponent(imageURL)}" alt="型號 ${model} 圖片" class="mt-4 max-h-48 mx-auto w-auto border rounded shadow" />`
             : `<div class="mt-4 text-sm text-gray-500 italic">🔍 找不到型號對應圖片</div>`;
 
           resultBox.innerHTML = `
@@ -117,15 +101,37 @@
           console.error("資料載入錯誤：", error);
           resultBox.innerHTML = "<p class='text-red-600'>查詢失敗，請稍後再試。</p>";
         }
+      };
+
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const sn = input.value.trim();
+        doQuery(sn);
       });
 
-      // 支援網址參數自動查詢
       const params = new URLSearchParams(window.location.search);
       const preset = params.get("sn");
-      if (preset) {
-        input.value = preset;
-        form.dispatchEvent(new Event("submit"));
-      }
+
+      fetch(modelImageURL)
+        .then(res => res.json())
+        .then(data => {
+          data.forEach(item => {
+            if (item["型號"] && item["對應圖片網址"]) {
+              modelImageMap[item["型號"].trim().toLowerCase()] = item["對應圖片網址"];
+            }
+          });
+          if (preset) {
+            input.value = preset;
+            doQuery(preset);
+          }
+        })
+        .catch(err => {
+          console.error("圖片資料載入錯誤：", err);
+          if (preset) {
+            input.value = preset;
+            doQuery(preset);
+          }
+        });
     });
   </script>
 </body>
