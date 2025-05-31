@@ -28,11 +28,7 @@
       const form = document.getElementById("query-form");
       const input = document.getElementById("sn");
       const resultBox = document.getElementById("result");
-
       const bottleDataURL = "data/data.json";
-      const modelImageURL = "https://script.google.com/macros/s/AKfycbxbmV64Jql7clWQqCaeakyjqkwIfCoRteVROpKeVGRh0dzU8ERdgGdZ95GGNBz7Chmt/exec";
-
-      let modelImageMap = {};
 
       const formatDate = (dateStr) => {
         try {
@@ -52,7 +48,6 @@
         try {
           const response = await fetch(bottleDataURL);
           const data = await response.json();
-
           const record = data.find(item => item["瓶號"] === sn);
 
           if (!record) {
@@ -70,8 +65,7 @@
           const sixMonthsPassed = received && ((now - received) > (180 * 24 * 60 * 60 * 1000));
 
           const model = record["型號"]?.trim();
-          const modelKey = model?.toLowerCase();
-          const imageURL = modelImageMap[modelKey];
+          const imageURL = model ? `data/images/${model}.png` : null;
 
           const validStatus = revoke
             ? '<span class="text-red-600 font-semibold">已註銷</span>'
@@ -82,7 +76,7 @@
             : "";
 
           const imageHTML = imageURL
-            ? `<img src="${decodeURIComponent(imageURL)}" alt="型號 ${model} 圖片" class="mt-4 max-h-48 mx-auto w-auto border rounded shadow" />`
+            ? `<img src="${imageURL}" alt="型號 ${model} 圖片" class="mt-4 max-h-48 mx-auto w-auto border rounded shadow" />`
             : `<div class="mt-4 text-sm text-gray-500 italic">🔍 找不到型號對應圖片</div>`;
 
           resultBox.innerHTML = `
@@ -111,27 +105,10 @@
 
       const params = new URLSearchParams(window.location.search);
       const preset = params.get("sn");
-
-      fetch(modelImageURL)
-        .then(res => res.json())
-        .then(data => {
-          data.forEach(item => {
-            if (item["型號"] && item["對應圖片網址"]) {
-              modelImageMap[item["型號"].trim().toLowerCase()] = item["對應圖片網址"];
-            }
-          });
-          if (preset) {
-            input.value = preset;
-            doQuery(preset);
-          }
-        })
-        .catch(err => {
-          console.error("圖片資料載入錯誤：", err);
-          if (preset) {
-            input.value = preset;
-            doQuery(preset);
-          }
-        });
+      if (preset) {
+        input.value = preset;
+        doQuery(preset);
+      }
     });
   </script>
 </body>
