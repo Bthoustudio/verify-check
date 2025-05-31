@@ -1,21 +1,20 @@
-
 document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("query-form");
   const input = document.getElementById("sn");
   const resultBox = document.getElementById("result");
 
-  const bottleDataURL = "data/data.json"; // 原本的瓶號查詢資料
-  const modelImageURL = "https://script.google.com/macros/s/AKfycbxbmV64Jql7clWQqCaeakyjqkwIfCoRteVROpKeVGRh0dzU8ERdgGdZ95GGNBz7Chmt/exec";
+  const bottleDataURL = "data/data.json"; // 瓶號查詢資料
+  const modelImageURL = "https://script.google.com/macros/s/AKfycbxbmV64Jql7clWQqCaeakyjqkwIfCoRteVROpKeVGRh0dzU8ERdgGdZ95GGNBz7Chmt/exec"; // 型號對應圖片網址
 
   let modelImageMap = {};
 
-  // 預先載入圖片對應表
+  // 預先載入型號對應圖片資料
   fetch(modelImageURL)
     .then(res => res.json())
     .then(data => {
       data.forEach(item => {
         if (item["型號"] && item["對應圖片網址"]) {
-          modelImageMap[item["型號"]] = item["對應圖片網址"];
+          modelImageMap[item["型號"].trim().toLowerCase()] = item["對應圖片網址"];
         }
       });
     })
@@ -57,19 +56,20 @@ document.addEventListener("DOMContentLoaded", () => {
         ? new Date(record["回收時間"]).toLocaleDateString("zh-TW", { year: "numeric", month: "numeric", day: "numeric" })
         : "-";
 
-      let validStatus = revoke
+      const validStatus = revoke
         ? '<span class="text-red-600 font-semibold">已註銷</span>'
         : '<span class="text-green-600 font-semibold">是</span>';
 
-      let extraWarning = (!revoke && sixMonthsPassed)
+      const extraWarning = (!revoke && sixMonthsPassed)
         ? '<p class="text-yellow-600 font-semibold">⚠️ 領取時間已超過半年，請向總部申請更換。</p>'
         : "";
 
       // 顯示圖片（若有對應型號）
-      const model = record["型號"];
-      const imageURL = modelImageMap[model];
+      const model = record["型號"]?.trim();
+      const modelKey = model?.toLowerCase();
+      const imageURL = modelImageMap[modelKey];
       const imageHTML = imageURL
-        ? `<img src="${imageURL}" alt="${model}" class="mt-4 w-full max-w-xs mx-auto border rounded shadow" />`
+        ? `<img src="${decodeURIComponent(imageURL)}" alt="${model}" class="mt-4 w-full max-w-xs mx-auto border rounded shadow" />`
         : "";
 
       resultBox.innerHTML = `
