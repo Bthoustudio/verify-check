@@ -4,6 +4,25 @@ document.addEventListener("DOMContentLoaded", () => {
   const input = document.getElementById("sn");
   const resultBox = document.getElementById("result");
 
+  const bottleDataURL = "data/data.json"; // 原本的瓶號查詢資料
+  const modelImageURL = "https://script.google.com/macros/s/AKfycbxNpu9j5GNrJjYjlxbmG4PRWNpWDz0rZvT4mB2b5A4AjGu_ne_aMdkhRA4XbGoeMrLX/exec";
+
+  let modelImageMap = {};
+
+  // 預先載入圖片對應表
+  fetch(modelImageURL)
+    .then(res => res.json())
+    .then(data => {
+      data.forEach(item => {
+        if (item["型號"] && item["對應圖片網址"]) {
+          modelImageMap[item["型號"]] = item["對應圖片網址"];
+        }
+      });
+    })
+    .catch(err => {
+      console.error("圖片對應資料載入錯誤：", err);
+    });
+
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
     const sn = input.value.trim();
@@ -12,7 +31,7 @@ document.addEventListener("DOMContentLoaded", () => {
     resultBox.innerHTML = "查詢中...";
 
     try {
-      const response = await fetch("data/data.json");
+      const response = await fetch(bottleDataURL);
       const data = await response.json();
 
       const record = data.find(item => item["瓶號"] === sn);
@@ -46,15 +65,23 @@ document.addEventListener("DOMContentLoaded", () => {
         ? '<p class="text-yellow-600 font-semibold">⚠️ 領取時間已超過半年，請向總部申請更換。</p>'
         : "";
 
+      // 顯示圖片（若有對應型號）
+      const model = record["型號"];
+      const imageURL = modelImageMap[model];
+      const imageHTML = imageURL
+        ? `<img src="${imageURL}" alt="${model}" class="mt-4 w-full max-w-xs mx-auto border rounded shadow" />`
+        : "";
+
       resultBox.innerHTML = `
         <div class="border-t pt-4 mt-4 space-y-1">
           <h3 class="text-lg font-semibold text-green-600">✅ 查驗成功：${record["瓶號"]}</h3>
           <p>使用店家：${record["使用店家"]}</p>
-          <p>型號：${record["型號"]}</p>
+          <p>型號：${model}</p>
           <p>領取時間：${dateStr}</p>
           <p>是否有效：${validStatus}</p>
           <p>註銷時間：${revokeTime}</p>
           ${extraWarning}
+          ${imageHTML}
         </div>
       `;
     } catch (error) {
