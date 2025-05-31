@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const resultBox = document.getElementById("result");
 
   const bottleDataURL = "data/data.json"; // 原本的瓶號查詢資料
-  const modelImageURL = "https://script.google.com/macros/s/AKfycbxNpu9j5GNrJjYjlxbmG4PRWNpWDz0rZvT4mB2b5A4AjGu_ne_aMdkhRA4XbGoeMrLX/exec";
+  const modelImageURL = "https://script.google.com/macros/s/AKfycbxbmV64Jql7clWQqCaeakyjqkwIfCoRteVROpKeVGRh0dzU8ERdgGdZ95GGNBz7Chmt/exec";
 
   let modelImageMap = {};
 
