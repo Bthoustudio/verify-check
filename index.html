@@ -31,13 +31,13 @@
       const bottleDataURL = "data/data.json";
 
       const formatDate = (dateStr) => {
-        try {
-          return new Date(dateStr).toLocaleDateString("zh-TW", {
-            year: "numeric", month: "numeric", day: "numeric"
-          });
-        } catch {
-          return dateStr?.split("T")[0] || "-";
-        }
+        if (!dateStr) return "-";
+        const d = new Date(dateStr);
+        return isNaN(d) ? "-" : d.toLocaleDateString("zh-TW", {
+          year: "numeric",
+          month: "numeric",
+          day: "numeric"
+        });
       };
 
       const doQuery = async (sn) => {
@@ -53,9 +53,17 @@
           if (!record) {
             input.classList.add("border-red-500");
             resultBox.innerHTML = `
-              <h2 class="text-red-600 font-semibold">⚠️ 查無此瓶號資料</h2>
-              <p>請確認您輸入的瓶號是否正確，或聯繫水宅客服。</p>
-            `;
+  <div class="border-t pt-4 mt-4 space-y-1">
+    <h3 class="text-lg font-semibold text-green-600">✅ 查驗成功：${record["瓶號"]}</h3>
+    <p>使用店家：${record["使用店家"] || "-"}</p>
+    <p>型號：${model || "-"}</p>
+    <p>領取時間：${formatDate(record["領取時間"])}</p>
+    <p>是否有效：${validStatus}</p>
+    ${revoke ? `<p>註銷時間：${formatDate(record["回收時間"])}</p>` : ""}
+    ${extraWarning}
+    ${imageHTML}
+  </div>
+`;
             return;
           }
 
@@ -80,17 +88,17 @@
             : `<div class="mt-4 text-sm text-gray-500 italic">🔍 找不到型號對應圖片</div>`;
 
           resultBox.innerHTML = `
-            <div class="border-t pt-4 mt-4 space-y-1">
-              <h3 class="text-lg font-semibold text-green-600">✅ 查驗成功：${record["瓶號"]}</h3>
-              <p>使用店家：${record["使用店家"]}</p>
-              <p>型號：${model}</p>
-              <p>領取時間：${formatDate(record["領取時間"])}</p>
-              <p>是否有效：${validStatus}</p>
-              <p>註銷時間：${formatDate(record["回收時間"])}</p>
-              ${extraWarning}
-              ${imageHTML}
-            </div>
-          `;
+  <div class="border-t pt-4 mt-4 space-y-1">
+    <h3 class="text-lg font-semibold text-green-600">✅ 查驗成功：${record["瓶號"]}</h3>
+    <p>使用店家：${record["使用店家"] || "-"}</p>
+    <p>型號：${model || "-"}</p>
+    <p>領取時間：${formatDate(record["領取時間"])}</p>
+    <p>是否有效：${validStatus}</p>
+    ${revoke ? `<p>註銷時間：${formatDate(record["回收時間"])}</p>` : ""}
+    ${extraWarning}
+    ${imageHTML}
+  </div>
+`;
         } catch (error) {
           console.error("資料載入錯誤：", error);
           resultBox.innerHTML = "<p class='text-red-600'>查詢失敗，請稍後再試。</p>";
